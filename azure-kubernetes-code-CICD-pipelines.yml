@@ -36,11 +36,11 @@ stages:
         ArtifactName: 'manifest'
         publishLocation: 'Container'
   
-  stage: Deploy
-  displayName: Deploy image
-  jobs:  
-  - job: Deploy
-    displayName: Deploy
+    stage: Deploy
+    displayName: Deploy image
+    jobs:  
+    - job: Deploy
+      displayName: Deploy
     pool:
       vmImage: 'ubuntu-latest'
     steps:
@@ -49,9 +49,9 @@ stages:
           buildType: 'current'
           artifactName: 'manifest'
           itemPattern: '**/*.yaml'
-          targetPath: '$(System.ArtifactDirectory)'
-        
-        - task: KubernetesManifest@0
+          targetPath: '$(System.ArtifactDirectory)'\
+      Settings
+          - task: KubernetesManifest@0
           inputs:
             action: 'deploy'
             kubernetesServiceConnection: 'azure-Kubernetes-connection'
