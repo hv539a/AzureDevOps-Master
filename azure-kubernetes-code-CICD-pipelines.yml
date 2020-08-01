@@ -10,7 +10,7 @@ variables:
 
 stages:
 
-Stage 1
+# Stage 1
 # Build the docker image
 # Get the k8s configuration file
 # Deploy to the K8s cluster
