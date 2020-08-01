@@ -11,9 +11,9 @@ variables:
 stages:
 
 # Stage 1
-# Build the docker image
-# Get the k8s configuration file
-# Deploy to the K8s cluster
+# Build Docker Image
+# Publish k8s files
+
 - stage: Build
   displayName: Build image
   jobs:  
@@ -29,39 +29,44 @@ stages:
         command: 'buildAndPush'
         Dockerfile: '**/Dockerfile'
         tags: '$(tag)'
-
     - task: PublishBuildArtifacts@1
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-        ArtifactName: 'manifest'
+        ArtifactName: 'manifests'
         publishLocation: 'Container'
-  
-    stage: Deploy
-    displayName: Deploy image
-    jobs:  
-    - job: Deploy
-      displayName: Deploy
+
+- stage: Deploy
+  displayName: Deploy image
+  jobs:  
+  - job: Deploy
+    displayName: Deploy
     pool:
       vmImage: 'ubuntu-latest'
     steps:
-      - task: DownloadPipelineArtifact@2
-        inputs:
-          buildType: 'current'
-          artifactName: 'manifest'
-          itemPattern: '**/*.yaml'
-          targetPath: '$(System.ArtifactDirectory)'\
-      Settings
-          - task: KubernetesManifest@0
-          inputs:
-            action: 'deploy'
-            kubernetesServiceConnection: 'azure-Kubernetes-connection'
-            namespace: 'default'
-            manifests: '$(System.ArtifactDirectory)/configuration/kubernetes//deployment.yaml'
-            containers: 'in28min/currency-exchange-devops:$(tag)'
 
-      -
-# Stage2 :
-# Download the Kubernetes files
-# Deploy to kubernetes cluster with Docker image
+- stage: Deploy
+  displayName: Deploy image
+  jobs:  
+  - job: Deploy
+    displayName: Deploy
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - task: DownloadPipelineArtifact@2
+      inputs:
+        buildType: 'current'
+        artifactName: 'manifests'
+        itemPattern: '**/*.yaml'
+        targetPath: '$(System.ArtifactsDirectory)'
+    - task: KubernetesManifest@0
+      inputs:
+        action: 'deploy'
+        kubernetesServiceConnection: 'azure-Kubernetes-connection'
+        namespace: 'default'
+        manifests: '$(System.ArtifactsDirectory)/deployment.yaml'
+        containers: 'in28min/currency-exchange-devops:$(tag)'
+# Stage 2
+# Deploy to k8s cluster with Docker image
+
 
 
